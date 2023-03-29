@@ -223,7 +223,7 @@ void WINAPI ServiceMain(DWORD argc, TCHAR *argv[])
     STARTUPINFO startupInfo;
     ZeroMemory(&startupInfo, sizeof(STARTUPINFO));
     startupInfo.cb = sizeof(STARTUPINFO);
-    startupInfo.wShowWindow = 0;
+    startupInfo.wShowWindow = 1; // FIXME: Should be 0
     startupInfo.lpReserved = NULL;
     startupInfo.cbReserved2 = 0;
     startupInfo.lpReserved2 = NULL;
