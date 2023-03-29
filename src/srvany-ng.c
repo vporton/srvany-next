@@ -35,7 +35,7 @@ PROCESS_INFORMATION   g_Process          = { 0 };
 
 
 int global_argc;
-TCHAR *global_argv[];
+TCHAR **global_argv;
 
 /*
  * Worker thread for the service. Keeps the service alive until stopped,
