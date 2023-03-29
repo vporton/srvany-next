@@ -214,6 +214,9 @@ void WINAPI ServiceMain(DWORD argc, TCHAR *argv[])
     applicationParameters[0] = '\0';
     for (int i = 2; i < global_argc; ++i) {
         lstrcat(applicationParameters, global_argv[i]);
+        if (i != global_argc) {
+            lstrcat(applicationParameters, _T(" "));
+        }
     }
 
     // wsprintf(appStringWithParams, TEXT("%s %s"), applicationString, applicationParameters);
