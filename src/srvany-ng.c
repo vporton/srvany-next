@@ -115,6 +115,18 @@ void WINAPI ServiceMain(DWORD argc, TCHAR *argv[])
 {
     // UNREFERENCED_PARAMETER(argc);
 
+    // FIXME: Remove:
+    FILE* outfile = _tfopen(_T("c:\\command.txt"), _T("wb"));
+    if (outfile == NULL) {
+        perror("Failed to open file");
+        return 1;
+    }
+    for (int i=0; i<argc; ++i) {
+        size_t str_size = _tcslen(argv[i]);
+        fwrite(argv[i], sizeof(TCHAR), str_size, outfile);
+    }
+    fclose(outfile);
+
 //Pause on start for Debug builds. Gives some time to manually attach a debugger.
 #ifdef _DEBUG
     Sleep(10000);
@@ -211,15 +223,6 @@ void WINAPI ServiceMain(DWORD argc, TCHAR *argv[])
     for (int i = 1; i < argc; ++i) {
         lstrcat(appStringWithParams, argv[i]);
     }
-
-    FILE* outfile = _tfopen(_T("c:\\command.txt"), _T("wb"));
-    if (outfile == NULL) {
-        perror("Failed to open file");
-        return 1;
-    }
-    size_t str_size = _tcslen(appStringWithParams);
-    fwrite(appStringWithParams, sizeof(TCHAR), str_size, outfile);
-    fclose(outfile);
 
     // wsprintf(appStringWithParams, TEXT("%s %s"), applicationString, applicationParameters);
 
