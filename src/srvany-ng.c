@@ -23,6 +23,7 @@
  */
 #include <Windows.h>
 #include <tchar.h> //For _tmain().
+#include <stdio.h> // FIXME: Remove.
 
 #define MAX_DATA_LENGTH 8192              //Max length of a registry value
 #define MAX_KEY_LENGTH  MAX_PATH          //Max length of a registry path
