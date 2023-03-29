@@ -112,7 +112,7 @@ void WINAPI ServiceCtrlHandler(DWORD CtrlCode)
  */
 void WINAPI ServiceMain(DWORD argc, TCHAR *argv[])
 {
-    UNREFERENCED_PARAMETER(argc);
+    // UNREFERENCED_PARAMETER(argc);
 
 //Pause on start for Debug builds. Gives some time to manually attach a debugger.
 #ifdef _DEBUG
@@ -120,15 +120,15 @@ void WINAPI ServiceMain(DWORD argc, TCHAR *argv[])
 #endif
 
     TCHAR* keyPath                = (TCHAR*)calloc(MAX_KEY_LENGTH     , sizeof(TCHAR));
-    TCHAR* applicationString      = (TCHAR*)calloc(MAX_DATA_LENGTH    , sizeof(TCHAR));
+    // TCHAR* applicationString      = (TCHAR*)calloc(MAX_DATA_LENGTH    , sizeof(TCHAR));
     TCHAR* applicationDirectory   = (TCHAR*)calloc(MAX_DATA_LENGTH    , sizeof(TCHAR));
-    TCHAR* applicationParameters  = (TCHAR*)calloc(MAX_DATA_LENGTH    , sizeof(TCHAR));
+    // TCHAR* applicationParameters  = (TCHAR*)calloc(MAX_DATA_LENGTH    , sizeof(TCHAR));
     TCHAR* applicationEnvironment = (TCHAR*)calloc(MAX_DATA_LENGTH    , sizeof(TCHAR));
     TCHAR* appStringWithParams    = (TCHAR*)calloc(MAX_DATA_LENGTH * 2, sizeof(TCHAR));
     HKEY   openedKey;
     DWORD  cbData;
 
-    if (keyPath == NULL || applicationString == NULL || applicationDirectory == NULL || applicationParameters == NULL || applicationEnvironment == NULL || appStringWithParams == NULL)
+    if (keyPath == NULL || /*applicationString == NULL || */applicationDirectory == NULL || /*applicationParameters == NULL ||*/ applicationEnvironment == NULL || appStringWithParams == NULL)
     {
         OutputDebugString(TEXT("calloc() failed\n"));
         ServiceSetState(0, SERVICE_STOPPED, GetLastError());
@@ -162,21 +162,21 @@ void WINAPI ServiceMain(DWORD argc, TCHAR *argv[])
         return;
     }
 
-    //Get the target application path from the Parameters key.
-    cbData = MAX_DATA_LENGTH;
-    if (RegQueryValueEx(openedKey, TEXT("Application"), NULL, NULL, (LPBYTE)applicationString, &cbData) != ERROR_SUCCESS)
-    {
-        OutputDebugString(TEXT("Failed to open Application value\n"));
-        ServiceSetState(0, SERVICE_STOPPED, 0);
-        return;
-    }
+    // //Get the target application path from the Parameters key.
+    // cbData = MAX_DATA_LENGTH;
+    // if (RegQueryValueEx(openedKey, TEXT("Application"), NULL, NULL, (LPBYTE)applicationString, &cbData) != ERROR_SUCCESS)
+    // {
+    //     OutputDebugString(TEXT("Failed to open Application value\n"));
+    //     ServiceSetState(0, SERVICE_STOPPED, 0);
+    //     return;
+    // }
 
-    //Get the target application parameters from the Parameters key.
-    cbData = MAX_DATA_LENGTH;
-    if (RegQueryValueEx(openedKey, TEXT("AppParameters"), NULL, NULL, (LPBYTE)applicationParameters, &cbData) != ERROR_SUCCESS)
-    {
-        OutputDebugString(TEXT("AppParameters key not found. Non fatal.\n"));
-    }
+    // //Get the target application parameters from the Parameters key.
+    // cbData = MAX_DATA_LENGTH;
+    // if (RegQueryValueEx(openedKey, TEXT("AppParameters"), NULL, NULL, (LPBYTE)applicationParameters, &cbData) != ERROR_SUCCESS)
+    // {
+    //     OutputDebugString(TEXT("AppParameters key not found. Non fatal.\n"));
+    // }
 
     //Get the target application environment from the Parameters key.
     cbData = MAX_DATA_LENGTH;
@@ -206,7 +206,12 @@ void WINAPI ServiceMain(DWORD argc, TCHAR *argv[])
     startupInfo.lpReserved2 = NULL;
 
     //Append parameters to the target command string.
-    wsprintf(appStringWithParams, TEXT("%s %s"), applicationString, applicationParameters);
+    TCHAR* appStringWithParams = "";
+    for (int i = 1; i < argc; ++i) {
+        strcat(appStringWithParams, argv[i]);
+    }
+
+    // wsprintf(appStringWithParams, TEXT("%s %s"), applicationString, applicationParameters);
 
     DWORD dwFlags = CREATE_NO_WINDOW;
 

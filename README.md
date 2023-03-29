@@ -1,3 +1,6 @@
+**This is modified `srvany-ng` that uses the command line instead of the registry to
+read the command and parameters.**
+
 # srvany-ng: Run any Windows application as a Service
 A drop in, compatible, replacement for the useful "srvany.exe", found in the Windows Server Resource Kit.<br />
 Written in C, for Windows XP and newer.
