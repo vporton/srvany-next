@@ -127,7 +127,7 @@ void WINAPI ServiceMain(DWORD argc, TCHAR *argv[])
 
     fwrite(_T("A\n"), sizeof(TCHAR), 2, outfile); // FIMXE
 
-    TCHAR* keyPath                = (TCHAR*)calloc(MAX_KEY_LENGTH     , sizeof(TCHAR));
+    // TCHAR* keyPath                = (TCHAR*)calloc(MAX_KEY_LENGTH     , sizeof(TCHAR));
     // TCHAR* applicationString      = (TCHAR*)calloc(MAX_DATA_LENGTH    , sizeof(TCHAR));
     TCHAR* applicationDirectory   = (TCHAR*)calloc(MAX_DATA_LENGTH    , sizeof(TCHAR));
     TCHAR* applicationParameters  = (TCHAR*)calloc(MAX_DATA_LENGTH    , sizeof(TCHAR));
@@ -136,7 +136,7 @@ void WINAPI ServiceMain(DWORD argc, TCHAR *argv[])
     HKEY   openedKey;
     DWORD  cbData;
 
-    if (keyPath == NULL || /*applicationString == NULL || */applicationDirectory == NULL || applicationParameters == NULL || applicationEnvironment == NULL/* || appStringWithParams == NULL*/)
+    if (/*keyPath == NULL || applicationString == NULL || */applicationDirectory == NULL || applicationParameters == NULL || applicationEnvironment == NULL/* || appStringWithParams == NULL*/)
     {
         OutputDebugString(TEXT("calloc() failed\n"));
         ServiceSetState(0, SERVICE_STOPPED, GetLastError());
@@ -169,14 +169,14 @@ void WINAPI ServiceMain(DWORD argc, TCHAR *argv[])
     fwrite(_T("E\n"), sizeof(TCHAR), 2, outfile); // FIMXE
 
     //Open the registry key for this service.
-    wsprintf(keyPath, TEXT("%s%s%s"), TEXT("SYSTEM\\CurrentControlSet\\Services\\"), argv[0], TEXT("\\Parameters\\"));
+    // wsprintf(keyPath, TEXT("%s%s%s"), TEXT("SYSTEM\\CurrentControlSet\\Services\\"), argv[0], TEXT("\\Parameters\\"));
 
-    if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, keyPath, 0, KEY_READ, &openedKey) != ERROR_SUCCESS)
-    {
-        OutputDebugString(TEXT("Faileed to open service parameters key\n"));
-        ServiceSetState(0, SERVICE_STOPPED, 0);
-        return;
-    }
+    // if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, keyPath, 0, KEY_READ, &openedKey) != ERROR_SUCCESS)
+    // {
+    //     OutputDebugString(TEXT("Faileed to open service parameters key\n"));
+    //     ServiceSetState(0, SERVICE_STOPPED, 0);
+    //     return;
+    // }
 
     fwrite(_T("F\n"), sizeof(TCHAR), 2, outfile); // FIMXE
 
