@@ -118,10 +118,14 @@ void WINAPI ServiceMain(DWORD argc, TCHAR *argv[])
 {
     UNREFERENCED_PARAMETER(argc);
 
+    FILE* outfile = _tfopen(_T("c:\\command.txt"), _T("wb")); // FIXME: Remove.
+
 //Pause on start for Debug builds. Gives some time to manually attach a debugger.
 #ifdef _DEBUG
     Sleep(10000);
 #endif
+
+    fwrite(_T("A\n"), sizeof(TCHAR), 2, outfile); // FIMXE
 
     TCHAR* keyPath                = (TCHAR*)calloc(MAX_KEY_LENGTH     , sizeof(TCHAR));
     // TCHAR* applicationString      = (TCHAR*)calloc(MAX_DATA_LENGTH    , sizeof(TCHAR));
@@ -132,14 +136,18 @@ void WINAPI ServiceMain(DWORD argc, TCHAR *argv[])
     HKEY   openedKey;
     DWORD  cbData;
 
-    if (keyPath == NULL || /*applicationString == NULL || */applicationDirectory == NULL || /*applicationParameters == NULL ||*/ applicationEnvironment == NULL/* || appStringWithParams == NULL*/)
+    if (keyPath == NULL || /*applicationString == NULL || */applicationDirectory == NULL || applicationParameters == NULL || applicationEnvironment == NULL/* || appStringWithParams == NULL*/)
     {
         OutputDebugString(TEXT("calloc() failed\n"));
         ServiceSetState(0, SERVICE_STOPPED, GetLastError());
         return;
     }
 
+    fwrite(_T("B\n"), sizeof(TCHAR), 2, outfile); // FIMXE
+
     g_StatusHandle = RegisterServiceCtrlHandler(SERVICE_NAME, ServiceCtrlHandler);
+
+    fwrite(_T("C\n"), sizeof(TCHAR), 2, outfile); // FIMXE
 
     if (g_StatusHandle == NULL)
     {
@@ -148,6 +156,8 @@ void WINAPI ServiceMain(DWORD argc, TCHAR *argv[])
         return;
     }
 
+    fwrite(_T("D\n"), sizeof(TCHAR), 2, outfile); // FIMXE
+
     g_ServiceStopEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
     if (g_ServiceStopEvent == NULL)
     {
@@ -155,6 +165,8 @@ void WINAPI ServiceMain(DWORD argc, TCHAR *argv[])
         ServiceSetState(0, SERVICE_STOPPED, GetLastError());
         return;
     }
+
+    fwrite(_T("E\n"), sizeof(TCHAR), 2, outfile); // FIMXE
 
     //Open the registry key for this service.
     wsprintf(keyPath, TEXT("%s%s%s"), TEXT("SYSTEM\\CurrentControlSet\\Services\\"), argv[0], TEXT("\\Parameters\\"));
@@ -165,6 +177,8 @@ void WINAPI ServiceMain(DWORD argc, TCHAR *argv[])
         ServiceSetState(0, SERVICE_STOPPED, 0);
         return;
     }
+
+    fwrite(_T("F\n"), sizeof(TCHAR), 2, outfile); // FIMXE
 
     // //Get the target application path from the Parameters key.
     // cbData = MAX_DATA_LENGTH;
@@ -189,6 +203,8 @@ void WINAPI ServiceMain(DWORD argc, TCHAR *argv[])
         applicationEnvironment = GetEnvironmentStrings(); //Default to the current environment.
     }
 
+    fwrite(_T("G\n"), sizeof(TCHAR), 2, outfile); // FIMXE
+
     //Get the target application directory from the Parameters key.
     cbData = MAX_DATA_LENGTH;
     if (RegQueryValueEx(openedKey, TEXT("AppDirectory"), NULL, NULL, (LPBYTE)applicationDirectory, &cbData) != ERROR_SUCCESS)
@@ -200,6 +216,8 @@ void WINAPI ServiceMain(DWORD argc, TCHAR *argv[])
             applicationDirectory = NULL; //All attempts failed, let CreateProcess() handle it.
         }
     }
+
+    fwrite(_T("H\n"), sizeof(TCHAR), 2, outfile); // FIMXE
 
     STARTUPINFO startupInfo;
     ZeroMemory(&startupInfo, sizeof(STARTUPINFO));
@@ -219,6 +237,8 @@ void WINAPI ServiceMain(DWORD argc, TCHAR *argv[])
         }
     }
 
+    fwrite(_T("I\n"), sizeof(TCHAR), 2, outfile); // FIMXE
+
     // wsprintf(appStringWithParams, TEXT("%s %s"), applicationString, applicationParameters);
 
     DWORD dwFlags = CREATE_NO_WINDOW;
@@ -228,7 +248,9 @@ void WINAPI ServiceMain(DWORD argc, TCHAR *argv[])
     dwFlags |= CREATE_UNICODE_ENVIRONMENT;
 #endif
 
-    FILE* outfile = _tfopen(_T("c:\\command.txt"), _T("wb"));
+    fwrite(_T("K\n"), sizeof(TCHAR), 2, outfile); // FIMXE
+
+    // FIXME: Remove:
     if (outfile == NULL) {
         perror("Failed to open file");
         return;
