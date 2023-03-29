@@ -267,6 +267,22 @@ void WINAPI ServiceMain(DWORD argc, TCHAR *argv[])
     //Try to launch the target application.
     if (CreateProcess(global_argv[1], applicationParameters, NULL, NULL, FALSE, dwFlags, applicationEnvironment, applicationDirectory, &startupInfo, &g_Process))
     {
+        // FIXME: Remove:
+        DWORD error_code = GetLastError();
+        LPSTR message_buffer;
+        FormatMessageA(
+            FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+            NULL,
+            error_code,
+            MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+            (LPSTR)&message_buffer,
+            0,
+            NULL
+        );
+        fprintf(outfile, "Last error: %lu - %s\n", error_code, message_buffer);
+        LocalFree(message_buffer);
+        
+        
         ServiceSetState(SERVICE_ACCEPT_STOP, SERVICE_RUNNING, 0);
         HANDLE hThread = CreateThread(NULL, 0, ServiceWorkerThread, NULL, 0, NULL);
         if (hThread == NULL)
