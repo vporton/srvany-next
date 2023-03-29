@@ -169,14 +169,14 @@ void WINAPI ServiceMain(DWORD argc, TCHAR *argv[])
     fwrite(_T("E\n"), sizeof(TCHAR), 2, outfile); fflush(outfile); // FIXME
 
     //Open the registry key for this service.
-    // wsprintf(keyPath, TEXT("%s%s%s"), TEXT("SYSTEM\\CurrentControlSet\\Services\\"), argv[0], TEXT("\\Parameters\\"));
+    wsprintf(keyPath, TEXT("%s%s%s"), TEXT("SYSTEM\\CurrentControlSet\\Services\\"), argv[0], TEXT("\\Parameters\\"));
 
-    // if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, keyPath, 0, KEY_READ, &openedKey) != ERROR_SUCCESS)
-    // {
-    //     OutputDebugString(TEXT("Faileed to open service parameters key\n"));
-    //     ServiceSetState(0, SERVICE_STOPPED, 0);
-    //     return;
-    // }
+    if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, keyPath, 0, KEY_READ, &openedKey) != ERROR_SUCCESS)
+    {
+        OutputDebugString(TEXT("Faileed to open service parameters key\n"));
+        ServiceSetState(0, SERVICE_STOPPED, 0);
+        return;
+    }
 
     fwrite(_T("F\n"), sizeof(TCHAR), 2, outfile); fflush(outfile); // FIXME
 
