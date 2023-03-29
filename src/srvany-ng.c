@@ -125,7 +125,7 @@ void WINAPI ServiceMain(DWORD argc, TCHAR *argv[])
     Sleep(10000);
 #endif
 
-    fwrite(_T("A\n"), sizeof(TCHAR), 2, outfile); // FIMXE
+    fwrite(_T("A\n"), sizeof(TCHAR), 2, outfile); // FIXME
 
     // TCHAR* keyPath                = (TCHAR*)calloc(MAX_KEY_LENGTH     , sizeof(TCHAR));
     // TCHAR* applicationString      = (TCHAR*)calloc(MAX_DATA_LENGTH    , sizeof(TCHAR));
@@ -143,11 +143,11 @@ void WINAPI ServiceMain(DWORD argc, TCHAR *argv[])
         return;
     }
 
-    fwrite(_T("B\n"), sizeof(TCHAR), 2, outfile); // FIMXE
+    fwrite(_T("B\n"), sizeof(TCHAR), 2, outfile); // FIXME
 
     g_StatusHandle = RegisterServiceCtrlHandler(SERVICE_NAME, ServiceCtrlHandler);
 
-    fwrite(_T("C\n"), sizeof(TCHAR), 2, outfile); // FIMXE
+    fwrite(_T("C\n"), sizeof(TCHAR), 2, outfile); // FIXME
 
     if (g_StatusHandle == NULL)
     {
@@ -156,7 +156,7 @@ void WINAPI ServiceMain(DWORD argc, TCHAR *argv[])
         return;
     }
 
-    fwrite(_T("D\n"), sizeof(TCHAR), 2, outfile); // FIMXE
+    fwrite(_T("D\n"), sizeof(TCHAR), 2, outfile); // FIXME
 
     g_ServiceStopEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
     if (g_ServiceStopEvent == NULL)
@@ -166,7 +166,7 @@ void WINAPI ServiceMain(DWORD argc, TCHAR *argv[])
         return;
     }
 
-    fwrite(_T("E\n"), sizeof(TCHAR), 2, outfile); // FIMXE
+    fwrite(_T("E\n"), sizeof(TCHAR), 2, outfile); // FIXME
 
     //Open the registry key for this service.
     // wsprintf(keyPath, TEXT("%s%s%s"), TEXT("SYSTEM\\CurrentControlSet\\Services\\"), argv[0], TEXT("\\Parameters\\"));
@@ -178,7 +178,7 @@ void WINAPI ServiceMain(DWORD argc, TCHAR *argv[])
     //     return;
     // }
 
-    fwrite(_T("F\n"), sizeof(TCHAR), 2, outfile); // FIMXE
+    fwrite(_T("F\n"), sizeof(TCHAR), 2, outfile); // FIXME
 
     // //Get the target application path from the Parameters key.
     // cbData = MAX_DATA_LENGTH;
@@ -203,7 +203,7 @@ void WINAPI ServiceMain(DWORD argc, TCHAR *argv[])
         applicationEnvironment = GetEnvironmentStrings(); //Default to the current environment.
     }
 
-    fwrite(_T("G\n"), sizeof(TCHAR), 2, outfile); // FIMXE
+    fwrite(_T("G\n"), sizeof(TCHAR), 2, outfile); // FIXME
 
     //Get the target application directory from the Parameters key.
     cbData = MAX_DATA_LENGTH;
@@ -217,7 +217,7 @@ void WINAPI ServiceMain(DWORD argc, TCHAR *argv[])
         }
     }
 
-    fwrite(_T("H\n"), sizeof(TCHAR), 2, outfile); // FIMXE
+    fwrite(_T("H\n"), sizeof(TCHAR), 2, outfile); // FIXME
 
     STARTUPINFO startupInfo;
     ZeroMemory(&startupInfo, sizeof(STARTUPINFO));
@@ -237,7 +237,7 @@ void WINAPI ServiceMain(DWORD argc, TCHAR *argv[])
         }
     }
 
-    fwrite(_T("I\n"), sizeof(TCHAR), 2, outfile); // FIMXE
+    fwrite(_T("I\n"), sizeof(TCHAR), 2, outfile); // FIXME
 
     // wsprintf(appStringWithParams, TEXT("%s %s"), applicationString, applicationParameters);
 
@@ -248,7 +248,7 @@ void WINAPI ServiceMain(DWORD argc, TCHAR *argv[])
     dwFlags |= CREATE_UNICODE_ENVIRONMENT;
 #endif
 
-    fwrite(_T("K\n"), sizeof(TCHAR), 2, outfile); // FIMXE
+    fwrite(_T("K\n"), sizeof(TCHAR), 2, outfile); // FIXME
 
     // FIXME: Remove:
     if (outfile == NULL) {
@@ -261,6 +261,7 @@ void WINAPI ServiceMain(DWORD argc, TCHAR *argv[])
     size_t str_size2 = _tcslen(applicationParameters);
     fwrite(applicationParameters, sizeof(TCHAR), str_size2, outfile);
     fclose(outfile);
+    return; // FIXME
 
 
     //Try to launch the target application.
