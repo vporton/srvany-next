@@ -206,7 +206,7 @@ void WINAPI ServiceMain(DWORD argc, TCHAR *argv[])
     startupInfo.lpReserved2 = NULL;
 
     //Append parameters to the target command string.
-    TCHAR* appStringWithParams = "";
+    appStringWithParams[0] = '\0';
     for (int i = 1; i < argc; ++i) {
         strcat(appStringWithParams, argv[i]);
     }
