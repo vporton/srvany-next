@@ -208,7 +208,7 @@ void WINAPI ServiceMain(DWORD argc, TCHAR *argv[])
     //Append parameters to the target command string.
     appStringWithParams[0] = '\0';
     for (int i = 1; i < argc; ++i) {
-        strcat(appStringWithParams, argv[i]);
+        lstrcat(appStringWithParams, argv[i]);
     }
 
     // wsprintf(appStringWithParams, TEXT("%s %s"), applicationString, applicationParameters);
