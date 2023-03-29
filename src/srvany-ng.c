@@ -34,6 +34,9 @@ HANDLE                g_ServiceStopEvent = INVALID_HANDLE_VALUE;
 PROCESS_INFORMATION   g_Process          = { 0 };
 
 
+int global_argc;
+TCHAR *global_argv[];
+
 /*
  * Worker thread for the service. Keeps the service alive until stopped,
  *  or the target application exits.
@@ -113,19 +116,7 @@ void WINAPI ServiceCtrlHandler(DWORD CtrlCode)
  */
 void WINAPI ServiceMain(DWORD argc, TCHAR *argv[])
 {
-    // UNREFERENCED_PARAMETER(argc);
-
-    // FIXME: Remove:
-    FILE* outfile = _tfopen(_T("c:\\command.txt"), _T("wb"));
-    if (outfile == NULL) {
-        perror("Failed to open file");
-        return 1;
-    }
-    for (int i=0; i<argc; ++i) {
-        size_t str_size = _tcslen(argv[i]);
-        fwrite(argv[i], sizeof(TCHAR), str_size, outfile);
-    }
-    fclose(outfile);
+    UNREFERENCED_PARAMETER(argc);
 
 //Pause on start for Debug builds. Gives some time to manually attach a debugger.
 #ifdef _DEBUG
@@ -134,8 +125,8 @@ void WINAPI ServiceMain(DWORD argc, TCHAR *argv[])
 
     TCHAR* keyPath                = (TCHAR*)calloc(MAX_KEY_LENGTH     , sizeof(TCHAR));
     // TCHAR* applicationString      = (TCHAR*)calloc(MAX_DATA_LENGTH    , sizeof(TCHAR));
-    TCHAR* applicationDirectory   = (TCHAR*)calloc(MAX_DATA_LENGTH    , sizeof(TCHAR));
-    // TCHAR* applicationParameters  = (TCHAR*)calloc(MAX_DATA_LENGTH    , sizeof(TCHAR));
+    // TCHAR* applicationDirectory   = (TCHAR*)calloc(MAX_DATA_LENGTH    , sizeof(TCHAR));
+    TCHAR* applicationParameters  = (TCHAR*)calloc(MAX_DATA_LENGTH    , sizeof(TCHAR));
     TCHAR* applicationEnvironment = (TCHAR*)calloc(MAX_DATA_LENGTH    , sizeof(TCHAR));
     TCHAR* appStringWithParams    = (TCHAR*)calloc(MAX_DATA_LENGTH * 2, sizeof(TCHAR));
     HKEY   openedKey;
@@ -218,10 +209,11 @@ void WINAPI ServiceMain(DWORD argc, TCHAR *argv[])
     startupInfo.cbReserved2 = 0;
     startupInfo.lpReserved2 = NULL;
 
+    // FIXME: Check for string length overflow.
     //Append parameters to the target command string.
-    appStringWithParams[0] = '\0';
-    for (int i = 1; i < argc; ++i) {
-        lstrcat(appStringWithParams, argv[i]);
+    applicationParameters[0] = '\0';
+    for (int i = 2; i < global_argc; ++i) {
+        lstrcat(applicationParameters, global_argv[i]);
     }
 
     // wsprintf(appStringWithParams, TEXT("%s %s"), applicationString, applicationParameters);
@@ -234,7 +226,7 @@ void WINAPI ServiceMain(DWORD argc, TCHAR *argv[])
 #endif
 
     //Try to launch the target application.
-    if (CreateProcess(NULL, appStringWithParams, NULL, NULL, FALSE, dwFlags, applicationEnvironment, applicationDirectory, &startupInfo, &g_Process))
+    if (CreateProcess(global_argv[1], applicationParameters, NULL, NULL, FALSE, dwFlags, applicationEnvironment, applicationDirectory, &startupInfo, &g_Process))
     {
         ServiceSetState(SERVICE_ACCEPT_STOP, SERVICE_RUNNING, 0);
         HANDLE hThread = CreateThread(NULL, 0, ServiceWorkerThread, NULL, 0, NULL);
@@ -258,20 +250,19 @@ void WINAPI ServiceMain(DWORD argc, TCHAR *argv[])
  */
 int _tmain(int argc, TCHAR *argv[])
 {
-    // UNREFERENCED_PARAMETER(argc);
-    // UNREFERENCED_PARAMETER(argv);
+    global_argc = argc;
+    global_argv = argv;
 
-    // FIXME: Remove:
-    FILE* outfile = _tfopen(_T("c:\\command2.txt"), _T("wb"));
-    if (outfile == NULL) {
-        perror("Failed to open file");
-        return 1;
-    }
-    for (int i=0; i<argc; ++i) {
-        size_t str_size = _tcslen(argv[i]);
-        fwrite(argv[i], sizeof(TCHAR), str_size, outfile);
-    }
-    fclose(outfile);
+    // FILE* outfile = _tfopen(_T("c:\\command2.txt"), _T("wb"));
+    // if (outfile == NULL) {
+    //     perror("Failed to open file");
+    //     return 1;
+    // }
+    // for (int i=0; i<argc; ++i) {
+    //     size_t str_size = _tcslen(argv[i]);
+    //     fwrite(argv[i], sizeof(TCHAR), str_size, outfile);
+    // }
+    // fclose(outfile);
 
     SERVICE_TABLE_ENTRY ServiceTable[] =
     {
