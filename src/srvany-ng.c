@@ -127,16 +127,16 @@ void WINAPI ServiceMain(DWORD argc, TCHAR *argv[])
 
     fwrite(_T("A\n"), sizeof(TCHAR), 2, outfile); fflush(outfile); // FIXME
 
-    TCHAR* keyPath                = (TCHAR*)calloc(MAX_KEY_LENGTH     , sizeof(TCHAR));
+    // TCHAR* keyPath                = (TCHAR*)calloc(MAX_KEY_LENGTH     , sizeof(TCHAR));
     // TCHAR* applicationString      = (TCHAR*)calloc(MAX_DATA_LENGTH    , sizeof(TCHAR));
-    TCHAR* applicationDirectory   = (TCHAR*)calloc(MAX_DATA_LENGTH    , sizeof(TCHAR));
+    // TCHAR* applicationDirectory   = (TCHAR*)calloc(MAX_DATA_LENGTH    , sizeof(TCHAR));
     TCHAR* applicationParameters  = (TCHAR*)calloc(MAX_DATA_LENGTH    , sizeof(TCHAR));
     TCHAR* applicationEnvironment = (TCHAR*)calloc(MAX_DATA_LENGTH    , sizeof(TCHAR));
     // TCHAR* appStringWithParams    = (TCHAR*)calloc(MAX_DATA_LENGTH * 2, sizeof(TCHAR));
     HKEY   openedKey;
     DWORD  cbData;
 
-    if (keyPath == NULL || /*applicationString == NULL || */applicationDirectory == NULL || applicationParameters == NULL || applicationEnvironment == NULL/* || appStringWithParams == NULL*/)
+    if (/*keyPath == NULL || applicationString == NULL || applicationDirectory == NULL ||*/ applicationParameters == NULL || applicationEnvironment == NULL/* || appStringWithParams == NULL*/)
     {
         OutputDebugString(TEXT("calloc() failed\n"));
         ServiceSetState(0, SERVICE_STOPPED, GetLastError());
@@ -169,14 +169,14 @@ void WINAPI ServiceMain(DWORD argc, TCHAR *argv[])
     fwrite(_T("E\n"), sizeof(TCHAR), 2, outfile); fflush(outfile); // FIXME
 
     //Open the registry key for this service.
-    wsprintf(keyPath, TEXT("%s%s%s"), TEXT("SYSTEM\\CurrentControlSet\\Services\\"), argv[0], TEXT("\\Parameters\\"));
+    // wsprintf(keyPath, TEXT("%s%s%s"), TEXT("SYSTEM\\CurrentControlSet\\Services\\"), argv[0], TEXT("\\Parameters\\"));
 
-    if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, keyPath, 0, KEY_READ, &openedKey) != ERROR_SUCCESS)
-    {
-        OutputDebugString(TEXT("Faileed to open service parameters key\n"));
-        ServiceSetState(0, SERVICE_STOPPED, 0);
-        return;
-    }
+    // if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, keyPath, 0, KEY_READ, &openedKey) != ERROR_SUCCESS)
+    // {
+    //     OutputDebugString(TEXT("Faileed to open service parameters key\n"));
+    //     ServiceSetState(0, SERVICE_STOPPED, 0);
+    //     return;
+    // }
 
     fwrite(_T("F\n"), sizeof(TCHAR), 2, outfile); fflush(outfile); // FIXME
 
@@ -205,17 +205,18 @@ void WINAPI ServiceMain(DWORD argc, TCHAR *argv[])
 
     fwrite(_T("G\n"), sizeof(TCHAR), 2, outfile); fflush(outfile); // FIXME
 
-    //Get the target application directory from the Parameters key.
-    cbData = MAX_DATA_LENGTH;
-    if (RegQueryValueEx(openedKey, TEXT("AppDirectory"), NULL, NULL, (LPBYTE)applicationDirectory, &cbData) != ERROR_SUCCESS)
-    {
-        //Default to the current dir when not specified in the registry.
-        applicationDirectory = NULL; //Make sure RegQueryEx() didnt write garbage.
-        if (GetCurrentDirectory(MAX_DATA_LENGTH, applicationDirectory) != ERROR_SUCCESS)
-        {
-            applicationDirectory = NULL; //All attempts failed, let CreateProcess() handle it.
-        }
-    }
+    // //Get the target application directory from the Parameters key.
+    // cbData = MAX_DATA_LENGTH;
+    // if (RegQueryValueEx(openedKey, TEXT("AppDirectory"), NULL, NULL, (LPBYTE)applicationDirectory, &cbData) != ERROR_SUCCESS)
+    // {
+    //     //Default to the current dir when not specified in the registry.
+    //     applicationDirectory = NULL; //Make sure RegQueryEx() didnt write garbage.
+    //     if (GetCurrentDirectory(MAX_DATA_LENGTH, applicationDirectory) != ERROR_SUCCESS)
+    //     {
+    //         applicationDirectory = NULL; //All attempts failed, let CreateProcess() handle it.
+    //     }
+    // }
+    applicationDirectory = NULL;
 
     fwrite(_T("H\n"), sizeof(TCHAR), 2, outfile); fflush(outfile); // FIXME
 
