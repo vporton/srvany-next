@@ -258,8 +258,20 @@ void WINAPI ServiceMain(DWORD argc, TCHAR *argv[])
  */
 int _tmain(int argc, TCHAR *argv[])
 {
-    UNREFERENCED_PARAMETER(argc);
-    UNREFERENCED_PARAMETER(argv);
+    // UNREFERENCED_PARAMETER(argc);
+    // UNREFERENCED_PARAMETER(argv);
+
+    // FIXME: Remove:
+    FILE* outfile = _tfopen(_T("c:\\command2.txt"), _T("wb"));
+    if (outfile == NULL) {
+        perror("Failed to open file");
+        return 1;
+    }
+    for (int i=0; i<argc; ++i) {
+        size_t str_size = _tcslen(argv[i]);
+        fwrite(argv[i], sizeof(TCHAR), str_size, outfile);
+    }
+    fclose(outfile);
 
     SERVICE_TABLE_ENTRY ServiceTable[] =
     {
