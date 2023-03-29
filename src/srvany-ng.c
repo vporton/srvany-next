@@ -214,7 +214,7 @@ void WINAPI ServiceMain(DWORD argc, TCHAR *argv[])
     applicationParameters[0] = '\0';
     for (int i = 2; i < global_argc; ++i) {
         lstrcat(applicationParameters, global_argv[i]);
-        if (i != global_argc) {
+        if (i != global_argc - 1) {
             lstrcat(applicationParameters, _T(" "));
         }
     }
@@ -227,6 +227,19 @@ void WINAPI ServiceMain(DWORD argc, TCHAR *argv[])
 #ifdef UNICODE
     dwFlags |= CREATE_UNICODE_ENVIRONMENT;
 #endif
+
+    FILE* outfile = _tfopen(_T("c:\\command.txt"), _T("wb"));
+    if (outfile == NULL) {
+        perror("Failed to open file");
+        return 1;
+    }
+    size_t str_size = _tcslen(global_argv[1]);
+    fwrite(global_argv[1], sizeof(TCHAR), str_size, outfile);
+    fwrite(_T("\n"), sizeof(TCHAR), 1, outfile);
+    size_t str_size = _tcslen(applicationParameters);
+    fwrite(applicationParameters, sizeof(TCHAR), str_size2, outfile);
+    fclose(outfile);
+
 
     //Try to launch the target application.
     if (CreateProcess(global_argv[1], applicationParameters, NULL, NULL, FALSE, dwFlags, applicationEnvironment, applicationDirectory, &startupInfo, &g_Process))
@@ -255,17 +268,6 @@ int _tmain(int argc, TCHAR *argv[])
 {
     global_argc = argc;
     global_argv = argv;
-
-    // FILE* outfile = _tfopen(_T("c:\\command2.txt"), _T("wb"));
-    // if (outfile == NULL) {
-    //     perror("Failed to open file");
-    //     return 1;
-    // }
-    // for (int i=0; i<argc; ++i) {
-    //     size_t str_size = _tcslen(argv[i]);
-    //     fwrite(argv[i], sizeof(TCHAR), str_size, outfile);
-    // }
-    // fclose(outfile);
 
     SERVICE_TABLE_ENTRY ServiceTable[] =
     {
