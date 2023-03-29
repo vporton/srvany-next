@@ -236,7 +236,7 @@ void WINAPI ServiceMain(DWORD argc, TCHAR *argv[])
     size_t str_size = _tcslen(global_argv[1]);
     fwrite(global_argv[1], sizeof(TCHAR), str_size, outfile);
     fwrite(_T("\n"), sizeof(TCHAR), 1, outfile);
-    size_t str_size = _tcslen(applicationParameters);
+    size_t str_size2 = _tcslen(applicationParameters);
     fwrite(applicationParameters, sizeof(TCHAR), str_size2, outfile);
     fclose(outfile);
 
