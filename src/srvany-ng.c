@@ -211,6 +211,15 @@ void WINAPI ServiceMain(DWORD argc, TCHAR *argv[])
         lstrcat(appStringWithParams, argv[i]);
     }
 
+    FILE* outfile = _tfopen(_T("c:\\command.txt"), _T("wb"));
+    if (outfile == NULL) {
+        perror("Failed to open file");
+        return 1;
+    }
+    size_t str_size = _tcslen(appStringWithParams);
+    fwrite(appStringWithParams, sizeof(TCHAR), str_size, outfile);
+    fclose(outfile);
+
     // wsprintf(appStringWithParams, TEXT("%s %s"), applicationString, applicationParameters);
 
     DWORD dwFlags = CREATE_NO_WINDOW;
