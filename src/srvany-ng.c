@@ -231,7 +231,7 @@ void WINAPI ServiceMain(DWORD argc, TCHAR *argv[])
     FILE* outfile = _tfopen(_T("c:\\command.txt"), _T("wb"));
     if (outfile == NULL) {
         perror("Failed to open file");
-        return 1;
+        return;
     }
     size_t str_size = _tcslen(global_argv[1]);
     fwrite(global_argv[1], sizeof(TCHAR), str_size, outfile);
