@@ -125,14 +125,14 @@ void WINAPI ServiceMain(DWORD argc, TCHAR *argv[])
 
     TCHAR* keyPath                = (TCHAR*)calloc(MAX_KEY_LENGTH     , sizeof(TCHAR));
     // TCHAR* applicationString      = (TCHAR*)calloc(MAX_DATA_LENGTH    , sizeof(TCHAR));
-    // TCHAR* applicationDirectory   = (TCHAR*)calloc(MAX_DATA_LENGTH    , sizeof(TCHAR));
+    TCHAR* applicationDirectory   = (TCHAR*)calloc(MAX_DATA_LENGTH    , sizeof(TCHAR));
     TCHAR* applicationParameters  = (TCHAR*)calloc(MAX_DATA_LENGTH    , sizeof(TCHAR));
     TCHAR* applicationEnvironment = (TCHAR*)calloc(MAX_DATA_LENGTH    , sizeof(TCHAR));
-    TCHAR* appStringWithParams    = (TCHAR*)calloc(MAX_DATA_LENGTH * 2, sizeof(TCHAR));
+    // TCHAR* appStringWithParams    = (TCHAR*)calloc(MAX_DATA_LENGTH * 2, sizeof(TCHAR));
     HKEY   openedKey;
     DWORD  cbData;
 
-    if (keyPath == NULL || /*applicationString == NULL || */applicationDirectory == NULL || /*applicationParameters == NULL ||*/ applicationEnvironment == NULL || appStringWithParams == NULL)
+    if (keyPath == NULL || /*applicationString == NULL || */applicationDirectory == NULL || /*applicationParameters == NULL ||*/ applicationEnvironment == NULL/* || appStringWithParams == NULL*/)
     {
         OutputDebugString(TEXT("calloc() failed\n"));
         ServiceSetState(0, SERVICE_STOPPED, GetLastError());
