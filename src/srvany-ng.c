@@ -22,6 +22,7 @@
  * SOFTWARE.
  */
 #include <Windows.h>
+#include <processthreadsapi.h>
 #include <tchar.h> //For _tmain().
 #include <stdio.h> // FIXME: Remove.
 
