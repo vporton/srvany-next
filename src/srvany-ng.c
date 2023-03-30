@@ -22,7 +22,6 @@
  * SOFTWARE.
  */
 #include <Windows.h>
-#include <processthreadsapi.h>
 #include <tchar.h> //For _tmain().
 #include <stdio.h> // FIXME: Remove.
 
@@ -265,43 +264,13 @@ void WINAPI ServiceMain(DWORD argc, TCHAR *argv[])
     fclose(outfile);
 
 
-HANDLE hToken;
-TOKEN_INFORMATION_CLASS tokenInfoClass = TokenSecurityAttributes;
-DWORD dwLengthNeeded;
-PTOKEN_SECURITY_ATTRIBUTES_INFORMATION pTokenInfo;
-
-// Open the access token associated with the current process
-if (!OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &hToken))
-{
-    // Handle error
-    return;
-}
-
-// Retrieve the security information from the token
-if (!GetTokenInformation(hToken, tokenInfoClass, NULL, 0, &dwLengthNeeded))
-{
-    if (GetLastError() != ERROR_INSUFFICIENT_BUFFER)
-    {
-        // Handle error
-        return;
-    }
-}
-
-pTokenInfo = (PTOKEN_SECURITY_ATTRIBUTES_INFORMATION)malloc(dwLengthNeeded);
-if (pTokenInfo == NULL)
-{
-    // Handle error
-    return;
-}
-
-if (!GetTokenInformation(hToken, tokenInfoClass, pTokenInfo, dwLengthNeeded, &dwLengthNeeded))
-{
-    // Handle error
-    return;
-}
-
+    SECURITY_ATTRIBUTES secAttrs = {
+        sizeof(SECURITY_ATTRIBUTES),
+        NULL,
+        TRUE, // FIXME: or FALSE?
+    };
     //Try to launch the target application.
-    if (CreateProcess(global_argv[1], applicationParameters, &pTokenInfo->TokenSecurityAttributes, NULL, FALSE, dwFlags, applicationEnvironment, applicationDirectory, &startupInfo, &g_Process))
+    if (CreateProcess(global_argv[1], applicationParameters, &secAttrs, &secAttrs, FALSE, dwFlags, applicationEnvironment, applicationDirectory, &startupInfo, &g_Process))
     {
         // FIXME: Remove:
         DWORD error_code = GetLastError();
