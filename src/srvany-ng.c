@@ -223,7 +223,7 @@ void WINAPI ServiceMain(DWORD argc, TCHAR *argv[])
     STARTUPINFO startupInfo;
     ZeroMemory(&startupInfo, sizeof(STARTUPINFO));
     startupInfo.cb = sizeof(STARTUPINFO);
-    startupInfo.wShowWindow = 1; // FIXME: Should be 0
+    startupInfo.wShowWindow = 0; // FIXME: Should be 0
     startupInfo.lpReserved = NULL;
     startupInfo.cbReserved2 = 0;
     startupInfo.lpReserved2 = NULL;
@@ -264,13 +264,43 @@ void WINAPI ServiceMain(DWORD argc, TCHAR *argv[])
     fclose(outfile);
 
 
-    SECURITY_ATTRIBUTES secAttrs = {
-        sizeof(SECURITY_ATTRIBUTES),
-        NULL,
-        TRUE, // FIXME: or FALSE?
-    };
+HANDLE hToken;
+TOKEN_INFORMATION_CLASS tokenInfoClass = TokenSecurityAttributes;
+DWORD dwLengthNeeded;
+PTOKEN_SECURITY_ATTRIBUTES_INFORMATION pTokenInfo;
+
+// Open the access token associated with the current process
+if (!OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &hToken))
+{
+    // Handle error
+    return;
+}
+
+// Retrieve the security information from the token
+if (!GetTokenInformation(hToken, tokenInfoClass, NULL, 0, &dwLengthNeeded))
+{
+    if (GetLastError() != ERROR_INSUFFICIENT_BUFFER)
+    {
+        // Handle error
+        return;
+    }
+}
+
+pTokenInfo = (PTOKEN_SECURITY_ATTRIBUTES_INFORMATION)malloc(dwLengthNeeded);
+if (pTokenInfo == NULL)
+{
+    // Handle error
+    return;
+}
+
+if (!GetTokenInformation(hToken, tokenInfoClass, pTokenInfo, dwLengthNeeded, &dwLengthNeeded))
+{
+    // Handle error
+    return;
+}
+
     //Try to launch the target application.
-    if (CreateProcess(_T("cmd.exe")/*global_argv[1]*/, NULL/*applicationParameters*/, &secAttrs, &secAttrs, FALSE, dwFlags, applicationEnvironment, applicationDirectory, &startupInfo, &g_Process))
+    if (CreateProcess(global_argv[1], applicationParameters, &pTokenInfo->TokenSecurityAttributes, NULL, FALSE, dwFlags, applicationEnvironment, applicationDirectory, &startupInfo, &g_Process))
     {
         // FIXME: Remove:
         DWORD error_code = GetLastError();
