@@ -23,7 +23,6 @@
  */
 #include <Windows.h>
 #include <tchar.h> //For _tmain().
-#include <stdio.h> // FIXME: Remove.
 
 #define MAX_DATA_LENGTH 8192              //Max length of a registry value
 #define MAX_KEY_LENGTH  MAX_PATH          //Max length of a registry path
@@ -118,14 +117,10 @@ void WINAPI ServiceMain(DWORD argc, TCHAR *argv[])
 {
     UNREFERENCED_PARAMETER(argc);
 
-    FILE* outfile = _tfopen(_T("c:\\command.txt"), _T("wb")); // FIXME: Remove.
-
 //Pause on start for Debug builds. Gives some time to manually attach a debugger.
 #ifdef _DEBUG
     Sleep(10000);
 #endif
-
-    fwrite(_T("A\n"), sizeof(TCHAR), 2, outfile); fflush(outfile); // FIXME
 
     // TCHAR* keyPath                = (TCHAR*)calloc(MAX_KEY_LENGTH     , sizeof(TCHAR));
     // TCHAR* applicationString      = (TCHAR*)calloc(MAX_DATA_LENGTH    , sizeof(TCHAR));
@@ -143,11 +138,7 @@ void WINAPI ServiceMain(DWORD argc, TCHAR *argv[])
         return;
     }
 
-    fwrite(_T("B\n"), sizeof(TCHAR), 2, outfile); fflush(outfile); // FIXME
-
     g_StatusHandle = RegisterServiceCtrlHandler(SERVICE_NAME, ServiceCtrlHandler);
-
-    fwrite(_T("C\n"), sizeof(TCHAR), 2, outfile); fflush(outfile); // FIXME
 
     if (g_StatusHandle == NULL)
     {
@@ -156,8 +147,6 @@ void WINAPI ServiceMain(DWORD argc, TCHAR *argv[])
         return;
     }
 
-    fwrite(_T("D\n"), sizeof(TCHAR), 2, outfile); fflush(outfile); // FIXME
-
     g_ServiceStopEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
     if (g_ServiceStopEvent == NULL)
     {
@@ -165,8 +154,6 @@ void WINAPI ServiceMain(DWORD argc, TCHAR *argv[])
         ServiceSetState(0, SERVICE_STOPPED, GetLastError());
         return;
     }
-
-    fwrite(_T("E\n"), sizeof(TCHAR), 2, outfile); fflush(outfile); // FIXME
 
     //Open the registry key for this service.
     // wsprintf(keyPath, TEXT("%s%s%s"), TEXT("SYSTEM\\CurrentControlSet\\Services\\"), argv[0], TEXT("\\Parameters\\"));
@@ -177,8 +164,6 @@ void WINAPI ServiceMain(DWORD argc, TCHAR *argv[])
     //     ServiceSetState(0, SERVICE_STOPPED, 0);
     //     return;
     // }
-
-    fwrite(_T("F\n"), sizeof(TCHAR), 2, outfile); fflush(outfile); // FIXME
 
     // //Get the target application path from the Parameters key.
     // cbData = MAX_DATA_LENGTH;
@@ -203,8 +188,6 @@ void WINAPI ServiceMain(DWORD argc, TCHAR *argv[])
         applicationEnvironment = GetEnvironmentStrings(); //Default to the current environment.
     }
 
-    fwrite(_T("G\n"), sizeof(TCHAR), 2, outfile); fflush(outfile); // FIXME
-
     // //Get the target application directory from the Parameters key.
     // cbData = MAX_DATA_LENGTH;
     // if (RegQueryValueEx(openedKey, TEXT("AppDirectory"), NULL, NULL, (LPBYTE)applicationDirectory, &cbData) != ERROR_SUCCESS)
@@ -218,12 +201,10 @@ void WINAPI ServiceMain(DWORD argc, TCHAR *argv[])
     // }
     applicationDirectory = NULL;
 
-    fwrite(_T("H\n"), sizeof(TCHAR), 2, outfile); fflush(outfile); // FIXME
-
     STARTUPINFO startupInfo;
     ZeroMemory(&startupInfo, sizeof(STARTUPINFO));
     startupInfo.cb = sizeof(STARTUPINFO);
-    startupInfo.wShowWindow = 0; // FIXME: Should be 0
+    startupInfo.wShowWindow = 0;
     startupInfo.lpReserved = NULL;
     startupInfo.cbReserved2 = 0;
     startupInfo.lpReserved2 = NULL;
@@ -238,8 +219,6 @@ void WINAPI ServiceMain(DWORD argc, TCHAR *argv[])
         }
     }
 
-    fwrite(_T("I\n"), sizeof(TCHAR), 2, outfile); fflush(outfile); // FIXME
-
     // wsprintf(appStringWithParams, TEXT("%s %s"), applicationString, applicationParameters);
 
     DWORD dwFlags = CREATE_NO_WINDOW;
@@ -249,26 +228,12 @@ void WINAPI ServiceMain(DWORD argc, TCHAR *argv[])
     dwFlags |= CREATE_UNICODE_ENVIRONMENT;
 #endif
 
-    fwrite(_T("J\n"), sizeof(TCHAR), 2, outfile); fflush(outfile); // FIXME
-
-    // FIXME: Remove:
-    if (outfile == NULL) {
-        perror("Failed to open file");
-        return;
-    }
-    size_t str_size = _tcslen(global_argv[1]);
-    fwrite(global_argv[1], sizeof(TCHAR), str_size, outfile);
-    fwrite(_T("\n"), sizeof(TCHAR), 1, outfile);
-    size_t str_size2 = _tcslen(applicationParameters);
-    fwrite(applicationParameters, sizeof(TCHAR), str_size2, outfile);
-    fclose(outfile);
-
-
     // SECURITY_ATTRIBUTES secAttrs = {
     //     sizeof(SECURITY_ATTRIBUTES),
     //     NULL,
     //     TRUE, // FIXME: or FALSE?
     // };
+    // FIXME: It seems that `CreateProcess` does not return!
     //Try to launch the target application.
     if (CreateProcess(global_argv[1], applicationParameters, NULL, NULL, FALSE, dwFlags, applicationEnvironment, applicationDirectory, &startupInfo, &g_Process))
     {
@@ -280,23 +245,7 @@ void WINAPI ServiceMain(DWORD argc, TCHAR *argv[])
             return;
         }
         WaitForSingleObject(hThread, INFINITE); //Wait here for a stop signal.
-    } else {
-        // FIXME: Remove:
-        DWORD error_code = GetLastError();
-        LPSTR message_buffer;
-        FormatMessageA(
-            FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-            NULL,
-            error_code,
-            MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-            (LPSTR)&message_buffer,
-            0,
-            NULL
-        );
-        fprintf(outfile, "Last error: %lu - %s\n", error_code, message_buffer); fflush(outfile);
-        LocalFree(message_buffer);
     }
-
     CloseHandle(g_ServiceStopEvent);
     ServiceSetState(0, SERVICE_STOPPED, 0);
 }//end ServiceMain()
