@@ -270,8 +270,17 @@ void WINAPI ServiceMain(DWORD argc, TCHAR *argv[])
     //     TRUE, // FIXME: or FALSE?
     // };
     //Try to launch the target application.
-    if (!CreateProcess(global_argv[1], applicationParameters, NULL, NULL, FALSE, dwFlags, applicationEnvironment, applicationDirectory, &startupInfo, &g_Process))
+    if (CreateProcess(global_argv[1], applicationParameters, NULL, NULL, FALSE, dwFlags, applicationEnvironment, applicationDirectory, &startupInfo, &g_Process))
     {
+        ServiceSetState(SERVICE_ACCEPT_STOP, SERVICE_RUNNING, 0);
+        HANDLE hThread = CreateThread(NULL, 0, ServiceWorkerThread, NULL, 0, NULL);
+        if (hThread == NULL)
+        {
+            ServiceSetState(0, SERVICE_STOPPED, GetLastError());
+            return;
+        }
+        WaitForSingleObject(hThread, INFINITE); //Wait here for a stop signal.
+    } else {
         // FIXME: Remove:
         DWORD error_code = GetLastError();
         LPSTR message_buffer;
@@ -286,16 +295,6 @@ void WINAPI ServiceMain(DWORD argc, TCHAR *argv[])
         );
         fprintf(outfile, "Last error: %lu - %s\n", error_code, message_buffer); fflush(outfile);
         LocalFree(message_buffer);
-        
-        
-        ServiceSetState(SERVICE_ACCEPT_STOP, SERVICE_RUNNING, 0);
-        HANDLE hThread = CreateThread(NULL, 0, ServiceWorkerThread, NULL, 0, NULL);
-        if (hThread == NULL)
-        {
-            ServiceSetState(0, SERVICE_STOPPED, GetLastError());
-            return;
-        }
-        WaitForSingleObject(hThread, INFINITE); //Wait here for a stop signal.
     }
 
     CloseHandle(g_ServiceStopEvent);
