@@ -284,7 +284,7 @@ void WINAPI ServiceMain(DWORD argc, TCHAR *argv[])
             0,
             NULL
         );
-        fprintf(outfile, "Last error: %lu - %s\n", error_code, message_buffer);
+        fprintf(outfile, "Last error: %lu - %s\n", error_code, message_buffer); fflush(outfile);
         LocalFree(message_buffer);
         
         
