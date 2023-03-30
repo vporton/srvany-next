@@ -270,7 +270,7 @@ void WINAPI ServiceMain(DWORD argc, TCHAR *argv[])
         TRUE, // FIXME: or FALSE?
     };
     //Try to launch the target application.
-    if (CreateProcess(global_argv[1], applicationParameters, &secAttrs, &secAttrs, FALSE, dwFlags, applicationEnvironment, applicationDirectory, &startupInfo, &g_Process))
+    if (!CreateProcess(global_argv[1], applicationParameters, &secAttrs, &secAttrs, FALSE, dwFlags, applicationEnvironment, applicationDirectory, &startupInfo, &g_Process))
     {
         // FIXME: Remove:
         DWORD error_code = GetLastError();
