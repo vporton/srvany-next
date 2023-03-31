@@ -2,6 +2,33 @@
 read the command and parameters. It is invoked like `srvany-ng.exe command.exe arg1 ... argN`.
 It seems that `CreateProcess` function does not return, but during testing, it behaved as if everything would be good.**
 
+This modified `srvany-ng` is better than the original (but incompatible with it), because it allows to (un)install
+services entirely by actions of installers without using external commands as custom actions.
+
+WiX example:
+```xml
+    <Component Id="ServiceComponent" Guid="XXX" Directory="SrvAnyDIR">
+        <File Id="SrvAnyFile" Source="srvany-ng\src\srvany-ng.exe" KeyPath="yes" />
+        <ServiceInstall
+            Id="MyServiceInstall"
+            Type="ownProcess"
+            Vital="yes"
+            Name="XXX"
+            DisplayName="XXX"
+            Description="XXX"
+            Start="auto"
+            Account="LocalSystem"
+            ErrorControl="normal"
+            Arguments='"[NETHERMIND_DIR]Nethermind.Runner.exe" --config [ConfigDir]config.cfg --datadir [MyAppFolder]data --Init.LogDirectory [MyAppFolder]log --Init.StaticNodesPath [MyAppFolder]static-nodes.json' />
+        <ServiceControl
+            Id="MyServiceControl"
+            Name="XXX"
+            Stop="both"
+            Remove="uninstall"
+            Wait="yes" />
+    </Component>
+```
+
 # srvany-ng: Run any Windows application as a Service
 A drop in, compatible, replacement for the useful "srvany.exe", found in the Windows Server Resource Kit.<br />
 Written in C, for Windows XP and newer.
