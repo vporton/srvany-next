@@ -1,5 +1,31 @@
-**This is modified `srvany-ng` that uses the command line instead of the registry to
-read the command and parameters. Untested.**
+**This is `srvany-next`, a modified `srvany-ng` that uses the command line instead of the registry to
+read the command and parameters. Note that is seems that `CreateProcess` function does not return,
+but the app externally works as intended (?)**
+
+Use it wiht [WiX](https://wixtoolset.org) like:
+
+```xml
+<Component Id="ServiceComponent" Guid="XXX" Directory="SrvAnyDIR">
+    <File Id="SrvAnyFile" Source="srvany-next\src\srvany-next.exe" KeyPath="yes" />
+    <ServiceInstall
+        Id="MyServiceInstall"
+        Type="ownProcess"
+        Vital="yes"
+        Name="XXX"
+        DisplayName="XXX"
+        Description="XXX"
+        Start="demand"
+        Account="LocalSystem"
+        ErrorControl="normal"
+        Arguments='"[NETHERMIND_DIR]Nethermind.Runner.exe" --config [ConfigDir]config.cfg' />
+    <ServiceControl
+        Id="MyServiceControl"
+        Name="XXX"
+        Stop="both"
+        Remove="uninstall"
+        Wait="yes" />
+</Component>
+```
 
 # srvany-ng: Run any Windows application as a Service
 A drop in, compatible, replacement for the useful "srvany.exe", found in the Windows Server Resource Kit.<br />
