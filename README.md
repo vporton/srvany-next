@@ -1,8 +1,11 @@
 **This is `srvany-next`, a modified `srvany-ng` that uses the command line instead of the registry to
-read the command and parameters. Note that is seems that `CreateProcess` function does not return,
-but the app externally works as intended (?)**
+read the command and parameters. It is invoked like `srvany-ng.exe command.exe arg1 ... argN`.
+It seems that `CreateProcess` function does not return, but during testing, it behaved as if everything would be good.**
 
-Use it wiht [WiX](https://wixtoolset.org) like:
+This modified `srvany-ng` is better than the original (but incompatible with it), because it allows to (un)install
+services entirely by actions of installers without using external commands as custom actions.
+
+Use it with [WiX](https://wixtoolset.org) like:
 
 ```xml
 <Component Id="ServiceComponent" Guid="XXX" Directory="SrvAnyDIR">
