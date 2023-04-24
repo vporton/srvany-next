@@ -1,3 +1,5 @@
+*.o
+*.exe
 /msvc/*.sdf
 /msvc/*.suo
 /msvc/*.user
