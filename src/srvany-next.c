@@ -238,14 +238,14 @@ void WINAPI ServiceMain(DWORD argc, TCHAR *argv[])
     if (CreateProcess(global_argv[1], applicationParameters, NULL, NULL, FALSE, dwFlags, applicationEnvironment, applicationDirectory, &startupInfo, &g_Process))
     {
         ServiceSetState(SERVICE_ACCEPT_STOP, SERVICE_RUNNING, 0);
-        // HANDLE hThread = CreateThread(NULL, 0, ServiceWorkerThread, NULL, 0, NULL);
-        // if (hThread == NULL)
-        // {
-        //     ServiceSetState(0, SERVICE_STOPPED, GetLastError());
-        //     return;
-        // }
-        // WaitForSingleObject(hThread, INFINITE); //Wait here for a stop signal.
-        Sleep(INFINITE);
+        HANDLE hThread = CreateThread(NULL, 0, ServiceWorkerThread, NULL, 0, NULL);
+        if (hThread == NULL)
+        {
+            ServiceSetState(0, SERVICE_STOPPED, GetLastError());
+            return;
+        }
+        WaitForSingleObject(hThread, INFINITE); //Wait here for a stop signal.
+        // Sleep(INFINITE);
     }
     CloseHandle(g_ServiceStopEvent);
     ServiceSetState(0, SERVICE_STOPPED, 0);
