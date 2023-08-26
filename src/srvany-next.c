@@ -175,11 +175,14 @@ void WINAPI ServiceMain(DWORD argc, TCHAR *argv[])
     // FIXME: Check for string length overflow.
     //Append parameters to the target command string.
     applicationParameters[0] = '\0';
+    lstrcat(applicationParameters, _T("\""));
+    lstrcat(applicationParameters, global_argv[1]);
+    lstrcat(applicationParameters, _T("\""));
     for (int i = 2; i < global_argc; ++i) {
+        lstrcat(applicationParameters, _T(" "));
         lstrcat(applicationParameters, global_argv[i]);
-        if (i != global_argc - 1) {
-            lstrcat(applicationParameters, _T(" "));
-        }
+        // if (i != global_argc - 1) {
+        // }
     }
 
     // wsprintf(appStringWithParams, TEXT("%s %s"), applicationString, applicationParameters);
@@ -200,7 +203,6 @@ void WINAPI ServiceMain(DWORD argc, TCHAR *argv[])
     //Try to launch the target application.
     if (CreateProcess(global_argv[1], applicationParameters, NULL, NULL, FALSE, dwFlags, applicationEnvironment, applicationDirectory, &startupInfo, &g_Process))
     {
-        fwrite("b", 1, 1, fp);
         ServiceSetState(SERVICE_ACCEPT_STOP, SERVICE_RUNNING, 0);
         // HANDLE hThread = CreateThread(NULL, 0, ServiceWorkerThread, NULL, 0, NULL);
         // if (hThread == NULL)
