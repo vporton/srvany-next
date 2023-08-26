@@ -40,23 +40,23 @@ TCHAR **global_argv;
  * Worker thread for the service. Keeps the service alive until stopped,
  *  or the target application exits.
  */
-DWORD WINAPI ServiceWorkerThread(LPVOID lpParam)
-{
-    UNREFERENCED_PARAMETER(lpParam);
+// DWORD WINAPI ServiceWorkerThread(LPVOID lpParam)
+// {
+//     UNREFERENCED_PARAMETER(lpParam);
 
-    while (WaitForSingleObject(g_ServiceStopEvent, 0) != WAIT_OBJECT_0)
-    {
-        //Check if the target application has exited.
-        if (WaitForSingleObject(g_Process.hProcess, 0) == WAIT_OBJECT_0)
-        {
-            //...If it has, end this thread, resulting in a service stop.
-            SetEvent(g_ServiceStopEvent);
-        }
-        Sleep(1000);
-    }
+//     while (WaitForSingleObject(g_ServiceStopEvent, 0) != WAIT_OBJECT_0)
+//     {
+//         //Check if the target application has exited.
+//         if (WaitForSingleObject(g_Process.hProcess, 0) == WAIT_OBJECT_0)
+//         {
+//             //...If it has, end this thread, resulting in a service stop.
+//             SetEvent(g_ServiceStopEvent);
+//         }
+//         Sleep(1000);
+//     }
 
-    return ERROR_SUCCESS;
-}//end ServiceWorkerThread()
+//     return ERROR_SUCCESS;
+// }//end ServiceWorkerThread()
 
 
 /*
@@ -155,32 +155,6 @@ void WINAPI ServiceMain(DWORD argc, TCHAR *argv[])
         return;
     }
 
-    //Open the registry key for this service.
-    // wsprintf(keyPath, TEXT("%s%s%s"), TEXT("SYSTEM\\CurrentControlSet\\Services\\"), argv[0], TEXT("\\Parameters\\"));
-
-    // if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, keyPath, 0, KEY_READ, &openedKey) != ERROR_SUCCESS)
-    // {
-    //     OutputDebugString(TEXT("Faileed to open service parameters key\n"));
-    //     ServiceSetState(0, SERVICE_STOPPED, 0);
-    //     return;
-    // }
-
-    // //Get the target application path from the Parameters key.
-    // cbData = MAX_DATA_LENGTH;
-    // if (RegQueryValueEx(openedKey, TEXT("Application"), NULL, NULL, (LPBYTE)applicationString, &cbData) != ERROR_SUCCESS)
-    // {
-    //     OutputDebugString(TEXT("Failed to open Application value\n"));
-    //     ServiceSetState(0, SERVICE_STOPPED, 0);
-    //     return;
-    // }
-
-    // //Get the target application parameters from the Parameters key.
-    // cbData = MAX_DATA_LENGTH;
-    // if (RegQueryValueEx(openedKey, TEXT("AppParameters"), NULL, NULL, (LPBYTE)applicationParameters, &cbData) != ERROR_SUCCESS)
-    // {
-    //     OutputDebugString(TEXT("AppParameters key not found. Non fatal.\n"));
-    // }
-
     //Get the target application environment from the Parameters key.
     cbData = MAX_DATA_LENGTH;
     if (RegQueryValueEx(openedKey, TEXT("AppEnvironment"), NULL, NULL, (LPBYTE)applicationEnvironment, &cbData) != ERROR_SUCCESS)
@@ -188,17 +162,6 @@ void WINAPI ServiceMain(DWORD argc, TCHAR *argv[])
         applicationEnvironment = GetEnvironmentStrings(); //Default to the current environment.
     }
 
-    // //Get the target application directory from the Parameters key.
-    // cbData = MAX_DATA_LENGTH;
-    // if (RegQueryValueEx(openedKey, TEXT("AppDirectory"), NULL, NULL, (LPBYTE)applicationDirectory, &cbData) != ERROR_SUCCESS)
-    // {
-    //     //Default to the current dir when not specified in the registry.
-    //     applicationDirectory = NULL; //Make sure RegQueryEx() didnt write garbage.
-    //     if (GetCurrentDirectory(MAX_DATA_LENGTH, applicationDirectory) != ERROR_SUCCESS)
-    //     {
-    //         applicationDirectory = NULL; //All attempts failed, let CreateProcess() handle it.
-    //     }
-    // }
     applicationDirectory = NULL;
 
     STARTUPINFO startupInfo;
@@ -237,17 +200,23 @@ void WINAPI ServiceMain(DWORD argc, TCHAR *argv[])
     //Try to launch the target application.
     if (CreateProcess(global_argv[1], applicationParameters, NULL, NULL, FALSE, dwFlags, applicationEnvironment, applicationDirectory, &startupInfo, &g_Process))
     {
+        fwrite("b", 1, 1, fp);
         ServiceSetState(SERVICE_ACCEPT_STOP, SERVICE_RUNNING, 0);
-        HANDLE hThread = CreateThread(NULL, 0, ServiceWorkerThread, NULL, 0, NULL);
-        if (hThread == NULL)
-        {
-            ServiceSetState(0, SERVICE_STOPPED, GetLastError());
-            return;
-        }
-        WaitForSingleObject(hThread, INFINITE); //Wait here for a stop signal.
+        // HANDLE hThread = CreateThread(NULL, 0, ServiceWorkerThread, NULL, 0, NULL);
+        // if (hThread == NULL)
+        // {
+        //     fwrite("c", 1, 1, fp);
+        //     ServiceSetState(0, SERVICE_STOPPED, GetLastError());
+        //     fclose(fp);
+        //     return;
+        // }
+        while (WaitForSingleObject(g_Process.hProcess, INFINITE) != WAIT_OBJECT_0)
+        {}
+        // WaitForSingleObject(hThread, INFINITE); //Wait here for a stop signal.
         // Sleep(INFINITE);
     }
     CloseHandle(g_ServiceStopEvent);
+    CloseHandle(g_Process.hProcess);
     ServiceSetState(0, SERVICE_STOPPED, 0);
 }//end ServiceMain()
 
